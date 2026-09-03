@@ -419,8 +419,7 @@ async function checkUsage() {
     usageArea.style.display = 'block';
   } catch (e) {
     if (e instanceof TypeError && String(e.message).includes('fetch')) {
-      showError('网络请求失败：本页面没有可用的转发后端（opencode.ai 不允许浏览器跨域直连）。' +
-        '请在下方「转发设置」填入你部署的 Cloudflare Worker 地址，或按 README 用 server.py 本地运行。');
+      showError('网络请求失败：本页面暂无可用的转发后端。点页面下方「Deploy to Cloudflare Workers」部署后即可查询。');
     } else {
       showError('请求出错: ' + e.message);
     }
