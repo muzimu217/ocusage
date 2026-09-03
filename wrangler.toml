@@ -1,0 +1,7 @@
+name = "ocusage"
+main = "cloudflare-worker.js"
+compatibility_date = "2026-09-03"
+
+routes = [
+  { pattern = "ocusage.muzimu.asia", custom_domain = true, zone_name = "muzimu.asia" }
+]

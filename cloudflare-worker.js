@@ -182,7 +182,7 @@ const HTML = `<!DOCTYPE html>
 const DIRECT_ENDPOINT = 'https://opencode.ai/zen/go/v1/usage';
 const PROXY_PATH = '/api/check';
 // 公共转发端点（部署自己的 Worker 后把地址填到这里并提交，访客即零配置）。
-const DEFAULT_PROXY = '';
+const DEFAULT_PROXY = 'https://ocusage.muzimu.asia';
 const LIMITS = { rolling5h: 12, weekly: 30, monthly: 60 };
 
 const keyInput = document.getElementById('keyInput');
