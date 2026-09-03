@@ -23,7 +23,8 @@ opencode.ai **不开放浏览器跨域（CORS）**，纯静态页面无法直连
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmuzimu217%2Focusage%2Fmain%2Fcloudflare-worker.js)
 
 > 想让 GitHub Pages 上的页面也零配置可查：部署后把 `https://xxx.workers.dev`
-> 填入 `index.html` 顶部的 `DEFAULT_PROXY` 并提交，Pages 会随提交自动更新。
+> 填入 `index.html` 顶部的 `DEFAULT_PROXY` 并提交——这是**维护者配置项**，
+> 访客页面上没有任何需要填写的东西，打开即查。
 
 改动页面后重新生成 Worker 文件：`python3 gen_worker.py`。
 

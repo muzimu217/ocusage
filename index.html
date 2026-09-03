@@ -168,14 +168,6 @@
     </div>
   </div>
 
-  <details style="margin-top:20px;font-size:12px;color:#8b949e">
-    <summary style="cursor:pointer;user-select:none">转发设置</summary>
-    <div class="input-row" style="margin-top:10px">
-      <input id="proxyInput" type="text" placeholder="https://your-worker.workers.dev" />
-      <button id="saveProxyBtn" style="background:#21262d;border:1px solid #30363d">保存</button>
-    </div>
-  </details>
-
   <div style="margin-top:20px;padding-top:16px;border-top:1px solid #21262d;text-align:center">
     <a href="https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmuzimu217%2Focusage%2Fmain%2Fcloudflare-worker.js"
        target="_blank" rel="noopener"
@@ -307,12 +299,10 @@ function updateWindow(name, w) {
   $derived.textContent = n.derived ? '（美元由百分比反推）' : '';
 }
 
-// 调用链：内置公共转发 > 自定义转发 > 同源后端(/api/check) > 浏览器直连
+// 调用链：内置公共转发(DEFAULT_PROXY，维护者在代码里配置) > 同源后端(/api/check) > 浏览器直连
 async function callAPI(key) {
-  const custom = (localStorage.getItem('ocusage_proxy') || '').trim().replace(/\/+$/, '');
   const candidates = [];
   if (DEFAULT_PROXY) candidates.push(DEFAULT_PROXY.replace(/\/+$/, '') + PROXY_PATH);
-  if (custom) candidates.push(custom + PROXY_PATH);
   candidates.push(PROXY_PATH); // 同源 server.py 或 Worker 托管时存在
 
   for (const url of candidates) {
@@ -440,17 +430,6 @@ async function checkUsage() {
 // Events
 checkBtn.addEventListener('click', checkUsage);
 keyInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkUsage(); });
-
-// 转发设置
-const proxyInput = document.getElementById('proxyInput');
-const saveProxyBtn = document.getElementById('saveProxyBtn');
-proxyInput.value = localStorage.getItem('ocusage_proxy') || '';
-saveProxyBtn.addEventListener('click', () => {
-  const v = proxyInput.value.trim().replace(/\/+$/, '');
-  if (v) { localStorage.setItem('ocusage_proxy', v); saveProxyBtn.textContent = '已保存 ✓'; }
-  else { localStorage.removeItem('ocusage_proxy'); saveProxyBtn.textContent = '已清除 ✓'; }
-  setTimeout(() => saveProxyBtn.textContent = '保存', 1200);
-});
 
 // Ctrl+V / paste detection: auto-check on paste if it looks like an API key
 keyInput.addEventListener('paste', () => {
