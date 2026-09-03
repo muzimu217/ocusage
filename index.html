@@ -327,7 +327,9 @@ async function callAPI(key) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key }),
       });
-      if (r.status !== 404) return r; // 404 = 该路径没有后端，继续下一候选
+      // 静态托管（GitHub Pages）通常会对 POST /api/check 回 404 或 405；
+      // 两者都表示这里没有转发后端，继续下一候选而不是把错误 HTML 显示给用户。
+      if (r.status !== 404 && r.status !== 405) return r;
     } catch (e) { /* 网络层失败（如 file:// 下相对路径），继续 */ }
   }
 
