@@ -18,15 +18,24 @@ python3 server.py
 
 opencode.ai **不开放浏览器跨域（CORS）**，纯静态页面无法直连查询，共享查询走 Worker 转发。
 
-**Fork 本仓库后，点下方按钮一键部署（页面 + 转发一体，部署完即是完整查询网页）：**
+**路径 A · 一键部署（最简单）：**
+
+点下方按钮 → 登录 Cloudflare → 点 **Deploy**，十几秒完成，得到 `https://xxx.workers.dev` 即是完整查询网页，直接把地址发给别人：
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmuzimu217%2Focusage%2Fmain%2Fcloudflare-worker.js)
 
-> 想让 GitHub Pages 上的页面也零配置可查：部署后把 `https://xxx.workers.dev`
-> 填入 `index.html` 顶部的 `DEFAULT_PROXY` 并提交——这是**维护者配置项**，
-> 访客页面上没有任何需要填写的东西，打开即查。
+**路径 B · 复制仓库 + 命令行部署：**
 
-改动页面后重新生成 Worker 文件：`python3 gen_worker.py`。
+```bash
+git clone https://github.com/muzimu217/ocusage && cd ocusage
+npx wrangler login      # 首次使用会打开浏览器授权
+npx wrangler deploy     # 部署完成，输出你的 workers.dev 地址
+```
+
+> 部署后想绑自有域名（`workers.dev` 在部分地区被 DNS 污染不可达），在 `wrangler.toml`
+> 中按其中注释加 `routes` 段再 `wrangler deploy` 一次即可。
+
+改动页面后重新生成 Worker 文件：`python3 gen_worker.py`，再部署一次。
 
 ### 方式三：GitHub Pages 静态页
 

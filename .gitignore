@@ -4,3 +4,5 @@ ocusage
 __pycache__/
 .DS_Store
 /tmp/
+.wrangler/
+wrangler.local.toml

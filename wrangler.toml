@@ -2,6 +2,8 @@ name = "ocusage"
 main = "cloudflare-worker.js"
 compatibility_date = "2026-09-03"
 
-routes = [
-  { pattern = "ocusage.muzimu.asia", custom_domain = true, zone_name = "muzimu.asia" }
-]
+# Fork 用户：直接 `wrangler deploy` 即可，部署后得到你的 workers.dev 地址。
+# 想绑自有域名（国内可达），在此加：
+# routes = [
+#   { pattern = "你的域名", custom_domain = true, zone_name = "你的域名所在 zone" }
+# ]
