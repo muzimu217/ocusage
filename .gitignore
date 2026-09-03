@@ -1,0 +1,6 @@
+# 编译产物与本地杂物
+ocusage
+*.log
+__pycache__/
+.DS_Store
+/tmp/
