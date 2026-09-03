@@ -14,32 +14,18 @@ python3 server.py
 # 浏览器打开 http://127.0.0.1:18083/，填入密钥即可
 ```
 
-### 方式二：共享部署（Cloudflare Worker，免费额度足够）
+### 方式二：共享部署（Cloudflare Worker）
 
-opencode.ai **不开放浏览器跨域（CORS）**，纯静态页面无法直连查询。
-想和别人共用，部署自包含的 Worker（页面 + 转发一体，部署完即是完整网页）：
+opencode.ai **不开放浏览器跨域（CORS）**，纯静态页面无法直连查询，共享查询走 Worker 转发。
 
-**一键部署（推荐）：**
+**Fork 本仓库后，点下方按钮一键部署（页面 + 转发一体，部署完即是完整查询网页）：**
 
-1. 点击按钮（页面底部也有同款按钮）：
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmuzimu217%2Focusage%2Fmain%2Fcloudflare-worker.js)
 
-   [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmuzimu217%2Focusage%2Fmain%2Fcloudflare-worker.js)
+> 想让 GitHub Pages 上的页面也零配置可查：部署后把 `https://xxx.workers.dev`
+> 填入 `index.html` 顶部的 `DEFAULT_PROXY` 并提交，Pages 会随提交自动更新。
 
-2. 浏览器跳到 Cloudflare，登录/免费注册（GitHub 账号可直接登录）
-3. 确认 Worker 名称，点 **Deploy**，十几秒完成
-4. 得到地址 `https://<你的名字>.workers.dev` —— 这就是完整的查询页面，
-   直接发给别人即可；每天 10 万次免费请求，团队共用足够
-
-**手动部署（可选）：**
-
-1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/) → Workers & Pages → Create
-2. 选 "Hello World" 模板创建 Worker → 编辑代码
-3. 把 [`cloudflare-worker.js`](cloudflare-worker.js) 的全部内容粘贴进去 → Save and Deploy
-
-**部署后想让 GitHub Pages 页面也能查询：**
-打开 Pages 页面 → 底部「转发设置」→ 填入你的 `https://xxx.workers.dev` → 保存（浏览器会记住）。
-
-改动页面后重新生成 Worker 文件：`python3 gen_worker.py`（然后需要同步更新线上部署的代码）。
+改动页面后重新生成 Worker 文件：`python3 gen_worker.py`。
 
 ### 方式三：GitHub Pages 静态页
 
