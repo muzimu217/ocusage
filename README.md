@@ -17,15 +17,29 @@ python3 server.py
 ### 方式二：共享部署（Cloudflare Worker，免费额度足够）
 
 opencode.ai **不开放浏览器跨域（CORS）**，纯静态页面无法直连查询。
-共享给别人用请部署自包含的 Worker（页面 + 转发一体，部署完即是完整网页）：
+想和别人共用，部署自包含的 Worker（页面 + 转发一体，部署完即是完整网页）：
 
-1. 点击一键部署（或复制 `cloudflare-worker.js` 到 Cloudflare Dashboard 手动创建 Worker）：
+**一键部署（推荐）：**
 
-   [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://raw.githubusercontent.com/muzimu217/ocusage/main/cloudflare-worker.js)
+1. 点击按钮（页面底部也有同款按钮）：
 
-2. 打开 `https://<你的worker>.workers.dev`，把地址发给别人即可查询。
+   [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmuzimu217%2Focusage%2Fmain%2Fcloudflare-worker.js)
 
-改动页面后重新生成 Worker 文件：`python3 gen_worker.py`。
+2. 浏览器跳到 Cloudflare，登录/免费注册（GitHub 账号可直接登录）
+3. 确认 Worker 名称，点 **Deploy**，十几秒完成
+4. 得到地址 `https://<你的名字>.workers.dev` —— 这就是完整的查询页面，
+   直接发给别人即可；每天 10 万次免费请求，团队共用足够
+
+**手动部署（可选）：**
+
+1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/) → Workers & Pages → Create
+2. 选 "Hello World" 模板创建 Worker → 编辑代码
+3. 把 [`cloudflare-worker.js`](cloudflare-worker.js) 的全部内容粘贴进去 → Save and Deploy
+
+**部署后想让 GitHub Pages 页面也能查询：**
+打开 Pages 页面 → 底部「转发设置」→ 填入你的 `https://xxx.workers.dev` → 保存（浏览器会记住）。
+
+改动页面后重新生成 Worker 文件：`python3 gen_worker.py`（然后需要同步更新线上部署的代码）。
 
 ### 方式三：GitHub Pages 静态页
 

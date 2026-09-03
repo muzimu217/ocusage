@@ -180,6 +180,18 @@ const HTML = `<!DOCTYPE html>
     <p style="line-height:1.6">opencode.ai 不开放浏览器跨域，静态页面（如 GitHub Pages）需经你自己的转发地址查询。
     一键部署见仓库 README 的「共享部署」。本地 server.py / Worker 托管时无需填写。</p>
   </details>
+
+  <div style="margin-top:20px;padding-top:16px;border-top:1px solid #21262d;font-size:12px;color:#8b949e">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span>想和别人共用？一键部署你自己的查询网页：</span>
+      <a href="https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmuzimu217%2Focusage%2Fmain%2Fcloudflare-worker.js"
+         target="_blank" rel="noopener"
+         style="padding:6px 14px;border-radius:8px;background:#f6821f;color:#fff;text-decoration:none;font-weight:600;white-space:nowrap">一键部署到 Cloudflare Workers</a>
+    </div>
+    <p style="margin-top:8px;line-height:1.6">免费注册即可，额度每天 10 万次请求，朋友/团队共用足够。
+    部署完成后得到的 <code style="color:#58a6ff">https://xxx.workers.dev</code> 本身就是完整的查询页面，直接把地址发给别人；
+    也可以把它填进上面的「转发设置」，让本页面经由它查询。</p>
+  </div>
 </div>
 
 <script>
