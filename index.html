@@ -209,7 +209,7 @@ function formatDuration(seconds) {
   seconds = Math.max(0, Math.floor(seconds));
   const d = Math.floor(seconds / 86400); seconds %= 86400;
   const h = Math.floor(seconds / 3600); seconds %= 3600;
-  const m = seconds / 60;
+  const m = Math.floor(seconds / 60); // 分钟取整，不显示小数
   if (d > 0) return `${d}天 ${h}小时`;
   if (h > 0) return `${h}小时 ${m}分钟`;
   return `${m}分钟`;
