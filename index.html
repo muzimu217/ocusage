@@ -90,6 +90,9 @@
     <input id="keyInput" type="password" placeholder="sk-… (从 opencode.ai/auth 获取)" />
     <button id="checkBtn">检测</button>
   </div>
+  <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#8b949e;margin:-12px 0 16px;cursor:pointer;user-select:none">
+    <input id="rememberKey" type="checkbox" style="accent-color:#238636"> 记住密钥（仅存本机浏览器，下次打开自动查询）
+  </label>
 
   <div id="error" class="error-msg"></div>
 
@@ -414,6 +417,10 @@ async function checkUsage() {
       fetchedAt.textContent = '';
     }
 
+    // 按勾选状态记住/清除密钥（仅本机 localStorage）
+    if (rememberKey.checked) localStorage.setItem('ocusage_key', key);
+    else localStorage.removeItem('ocusage_key');
+
     usageArea.style.display = 'block';
   } catch (e) {
     if (e instanceof TypeError && String(e.message).includes('fetch')) {
@@ -430,6 +437,24 @@ async function checkUsage() {
 // Events
 checkBtn.addEventListener('click', checkUsage);
 keyInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkUsage(); });
+
+// 懒人模式：#sk-… 链接直达（hash 不会发送到服务器，加载后从地址栏清除），
+// 或恢复记住的密钥并自动查询
+const rememberKey = document.getElementById('rememberKey');
+(function initKey() {
+  const hash = decodeURIComponent(location.hash.replace(/^#/, '')).trim();
+  const saved = localStorage.getItem('ocusage_key');
+  if (hash.startsWith('sk-')) {
+    keyInput.value = hash;
+    rememberKey.checked = true;
+    history.replaceState(null, '', location.pathname + location.search);
+    checkUsage();
+  } else if (saved) {
+    keyInput.value = saved;
+    rememberKey.checked = true;
+    checkUsage();
+  }
+})();
 
 // Ctrl+V / paste detection: auto-check on paste if it looks like an API key
 keyInput.addEventListener('paste', () => {

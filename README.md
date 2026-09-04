@@ -14,6 +14,8 @@ python3 server.py
 # 浏览器打开 http://127.0.0.1:18083/，填入密钥即可
 ```
 
+免粘贴：勾选「记住密钥」后打开页面即自动查询；也可以用 `https://ocusage.kcos.club/#sk-xxx` 直达（hash 仅在本机地址栏短暂存在，不会发送到服务器）。
+
 ### 方式二：共享部署（Cloudflare Worker）
 
 opencode.ai **不开放浏览器跨域（CORS）**，纯静态页面无法直连查询，共享查询走 Worker 转发。
