@@ -285,15 +285,16 @@ function updateWindow(name, w) {
     return;
   }
   const n = normalize(w);
-  const pct = Math.min(Math.max(n.pct, 0), 100);
+  const used = Math.min(Math.max(n.pct, 0), 100);
+  const leftPct = 100 - used; // 条与百分比均表示剩余：用得越多条越短
 
-  $pct.textContent = pct.toFixed(1) + '%';
-  $pct.style.color = pctColor(pct);
-  $bar.style.width = pct + '%';
-  $bar.style.background = pctColor(pct);
+  $pct.textContent = '剩余 ' + leftPct.toFixed(1) + '%';
+  $pct.style.color = pctColor(used); // 颜色仍按消耗程度告警
+  $bar.style.width = leftPct + '%';
+  $bar.style.background = pctColor(used);
   $detail.textContent = `已用 $${n.used.toFixed(2)} / $${n.limit.toFixed(2)}`;
   $left.textContent = `剩余 $${n.left.toFixed(2)}`;
-  $left.style.color = pct >= 90 ? '#da3633' : pct >= 75 ? '#d29922' : '#58a6ff';
+  $left.style.color = used >= 90 ? '#da3633' : used >= 75 ? '#d29922' : '#58a6ff';
 
   $reset.textContent = '重置于 ' + n.resetStr;
   $derived.textContent = n.derived ? '（美元由百分比反推）' : '';

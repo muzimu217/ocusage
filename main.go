@@ -256,18 +256,20 @@ func levelColor(pct float64) string {
 	}
 }
 
-func bar(pct float64, width int) string {
-	if pct < 0 {
-		pct = 0
+// bar renders a fill of fillPct percent of width, colored by healthPct
+// (the consumption level) so a short bar turns red as quota runs out.
+func bar(fillPct float64, width int, healthPct float64) string {
+	if fillPct < 0 {
+		fillPct = 0
 	}
-	if pct > 100 {
-		pct = 100
+	if fillPct > 100 {
+		fillPct = 100
 	}
-	filled := int(pct/100*float64(width) + 0.5)
+	filled := int(fillPct/100*float64(width) + 0.5)
 	if filled > width {
 		filled = width
 	}
-	c := levelColor(pct)
+	c := levelColor(healthPct)
 	return colorize(c, strings.Repeat("█", filled)) + strings.Repeat("░", width-filled)
 }
 
@@ -315,7 +317,7 @@ func (r *report) render(out io.Writer) {
 	if r.Plan != "" {
 		fmt.Fprintf(out, "  [plan: %s]", r.Plan)
 	}
-	fmt.Fprintf(out, "  %s\n", now.Format("2006-01-02 15:04:05"))
+	fmt.Fprintf(out, "  %s  (bar = remaining)\n", now.Format("2006-01-02 15:04:05"))
 	fmt.Fprintln(out, strings.Repeat("─", 72))
 
 	rows := []struct {
@@ -332,7 +334,8 @@ func (r *report) render(out io.Writer) {
 		}
 		w := row.w
 		c := levelColor(w.UsedPercent)
-		fmt.Fprintf(out, "%s  %s %5.1f%%", row.label, bar(w.UsedPercent, 28), w.UsedPercent)
+		leftPct := 100 - w.UsedPercent // bar and number show remaining
+		fmt.Fprintf(out, "%s  %s %5.1f%%", row.label, bar(leftPct, 28, w.UsedPercent), leftPct)
 
 		if rem, ok := w.remainingDollars(); ok {
 			fmt.Fprintf(out, "  used $%.2f / $%.2f  %s $%.2f",
