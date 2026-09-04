@@ -15,10 +15,10 @@ python3 server.py
 ```
 
 本地运行时查询链路是**同源优先**：密钥只经过你本机的 server.py，不会经过任何线上代理；
-页面结果里也会显示「本次经 本机后端」。`DEFAULT_PROXY` 仅是维护者为 GitHub Pages
-静态托管访客提供的兜底转发，本地部署不会被用到，无需修改任何配置。
+页面结果里也会显示「本次经 本机后端」。仓库不内置任何公共转发地址；若你用 GitHub Pages
+这类无后端静态托管对外服务，可把你的转发地址填入 `index.html` 的 `DEFAULT_PROXY`。
 
-免粘贴：勾选「记住密钥」后打开页面即自动查询；也可以用 `https://ocusage.kcos.club/#sk-xxx` 直达（hash 仅在本机地址栏短暂存在，不会发送到服务器）。
+免粘贴：勾选「记住密钥」后打开页面即自动查询；也可以用 `https://你的域名/#sk-xxx` 直达（hash 仅在本机地址栏短暂存在，不会发送到服务器）。
 支持存多个 key 并双击标签加备注，点击标签即可轮换查询——全部仅存本机浏览器 localStorage，不上传。
 
 ### 方式二：共享部署（Cloudflare Worker）
@@ -45,9 +45,9 @@ npx wrangler deploy     # 部署完成，输出你的 workers.dev 地址
 改动页面后重新生成 Worker 文件：`python3 gen_worker.py`，再部署一次。
 
 > **Fork 者须知**：通过 Worker 部署（上面两条路径）即完全独立——同源优先，访客的密钥
-> 只经过你自己的 Worker，原仓库的兜底地址不会被用到。但如果你 fork 后只用
-> GitHub Pages 纯静态托管（无后端）给他人访问，请把 `index.html` 里的 `DEFAULT_PROXY`
-> 改成你自己的转发地址或直接删掉，别让访客流量落到别人的服务上。
+> 只经过你自己的 Worker。仓库不内置任何转发地址；若你 fork 后改用 GitHub Pages
+> 纯静态托管（无后端）给他人访问，请自行把 `index.html` 里的 `DEFAULT_PROXY`
+> 填为你自己的转发地址，否则静态页无法完成查询。
 
 ### 方式三：GitHub Pages 静态页
 

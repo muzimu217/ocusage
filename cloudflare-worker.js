@@ -196,8 +196,10 @@ const HTML = `<!DOCTYPE html>
 <script>
 const DIRECT_ENDPOINT = 'https://opencode.ai/zen/go/v1/usage';
 const PROXY_PATH = '/api/check';
-// 公共转发端点（部署自己的 Worker 后把地址填到这里并提交，访客即零配置）。
-const DEFAULT_PROXY = 'https://ocusage.kcos.club';
+// 可选：静态托管（如 GitHub Pages，无后端）时的公共兜底转发地址。
+// 默认留空——由 server.py / Worker 托管时走同源，无需任何域名。
+// 维护者若运营公共转发，可在部署产物中自行填入，仓库不内置任何域名。
+const DEFAULT_PROXY = '';
 const LIMITS = { rolling5h: 12, weekly: 30, monthly: 60 };
 
 const keyInput = document.getElementById('keyInput');
