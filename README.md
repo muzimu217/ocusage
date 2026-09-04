@@ -71,6 +71,10 @@ OPENCODE_API_KEY=sk-xxxx ./ocusage -watch                # 30 秒刷新
 | `cloudflare-worker.js` | Worker 自包含部署版（由 `gen_worker.py` 生成） |
 | `main.go` | Go 版 CLI，零第三方依赖 |
 
+## 致谢
+
+- 本项目已在 [LINUX DO 社区](https://linux.do) 分享与认可，感谢社区朋友们的支持与反馈 🙌
+
 ## License
 
 MIT
