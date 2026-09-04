@@ -44,6 +44,11 @@ npx wrangler deploy     # 部署完成，输出你的 workers.dev 地址
 
 改动页面后重新生成 Worker 文件：`python3 gen_worker.py`，再部署一次。
 
+> **Fork 者须知**：通过 Worker 部署（上面两条路径）即完全独立——同源优先，访客的密钥
+> 只经过你自己的 Worker，原仓库的兜底地址不会被用到。但如果你 fork 后只用
+> GitHub Pages 纯静态托管（无后端）给他人访问，请把 `index.html` 里的 `DEFAULT_PROXY`
+> 改成你自己的转发地址或直接删掉，别让访客流量落到别人的服务上。
+
 ### 方式三：GitHub Pages 静态页
 
 页面在 Pages 上可打开，但受上述 CORS 限制，查询需在页面底部
