@@ -164,6 +164,7 @@
     <div class="timestamps" id="timestamps">
       <span id="planLabel"></span>
       <span id="fetchedAt"></span>
+      <span id="viaInfo"></span>
     </div>
   </div>
 
@@ -314,27 +315,29 @@ function updateWindow(name, w) {
   $derived.textContent = n.derived ? '（美元由百分比反推）' : '';
 }
 
-// 调用链：内置公共转发(DEFAULT_PROXY，维护者在代码里配置) > 同源后端(/api/check) > 浏览器直连
+// 调用链：同源后端(/api/check —— 本地部署时密钥不出本机) > 内置公共转发(静态托管访客兜底) > 浏览器直连
+// DEFAULT_PROXY 仅维护者页面托管在无后端的静态环境时使用；本地拉取运行不会用到它。
+let lastVia = '';
 async function callAPI(key) {
-  const candidates = [];
-  if (DEFAULT_PROXY) candidates.push(DEFAULT_PROXY.replace(/\/+$/, '') + PROXY_PATH);
-  candidates.push(PROXY_PATH); // 同源 server.py 或 Worker 托管时存在
+  const candidates = [{ url: PROXY_PATH, via: '本机后端' }];
+  if (DEFAULT_PROXY) candidates.push({ url: DEFAULT_PROXY.replace(/\/+$/, '') + PROXY_PATH, via: '公共转发 ' + DEFAULT_PROXY.replace(/^https?:\/\//, '') });
 
-  for (const url of candidates) {
+  for (const c of candidates) {
     try {
-      const r = await fetch(url, {
+      // 静态托管（GitHub Pages）会对 POST /api/check 回 404/405，
+      // 两者都表示这里没有转发后端，继续下一候选而不是把错误 HTML 显示给用户。
+      const r = await fetch(c.url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key }),
       });
-      // 静态托管（GitHub Pages）通常会对 POST /api/check 回 404 或 405；
-      // 两者都表示这里没有转发后端，继续下一候选而不是把错误 HTML 显示给用户。
-      if (r.status !== 404 && r.status !== 405) return r;
+      if (r.status !== 404 && r.status !== 405) { lastVia = c.via; return r; }
     } catch (e) { /* 网络层失败（如 file:// 下相对路径），继续 */ }
   }
 
   // 直连：opencode.ai 目前不返回 CORS 头，浏览器一般会拦截；
   // 在本页面由 Worker/server.py 同源托管时不会走到这里。
+  lastVia = '浏览器直连';
   return fetch(DIRECT_ENDPOINT, {
     headers: { 'Authorization': 'Bearer ' + key, 'Accept': 'application/json' },
   });
@@ -435,6 +438,9 @@ async function checkUsage() {
     const item = loadKeys().find(k => k.key === key);
     keyLabel.textContent = item ? item.label : '';
     keyLabel.style.display = item ? '' : 'none';
+
+    // 透明化：显示本次查询实际经过的链路（本机后端 / 公共转发 / 直连）
+    document.getElementById('viaInfo').textContent = ' · 本次经 ' + lastVia;
 
     usageArea.style.display = 'block';
   } catch (e) {
