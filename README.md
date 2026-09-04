@@ -15,6 +15,7 @@ python3 server.py
 ```
 
 免粘贴：勾选「记住密钥」后打开页面即自动查询；也可以用 `https://ocusage.kcos.club/#sk-xxx` 直达（hash 仅在本机地址栏短暂存在，不会发送到服务器）。
+支持存多个 key 并双击标签加备注，点击标签即可轮换查询——全部仅存本机浏览器 localStorage，不上传。
 
 ### 方式二：共享部署（Cloudflare Worker）
 

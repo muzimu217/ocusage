@@ -94,13 +94,15 @@ const HTML = `<!DOCTYPE html>
     <button id="checkBtn">检测</button>
   </div>
   <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#8b949e;margin:-12px 0 16px;cursor:pointer;user-select:none">
-    <input id="rememberKey" type="checkbox" style="accent-color:#238636"> 记住密钥（仅存本机浏览器，下次打开自动查询）
+    <input id="rememberKey" type="checkbox" style="accent-color:#238636"> 记住密钥（仅存本机；可存多个，点标签轮换）
   </label>
+  <div id="keyChips" style="display:none;flex-wrap:wrap;gap:6px;margin:-8px 0 16px;align-items:center"></div>
 
   <div id="error" class="error-msg"></div>
 
   <div id="usageArea" class="usage-card" style="display:none">
     <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center">
+      <span id="keyLabel" class="plan-badge" style="display:none"></span>
       <span id="planTag" class="plan-badge"></span>
       <span id="checkTime" style="font-size:12px;color:#8b949e"></span>
     </div>
@@ -420,9 +422,13 @@ async function checkUsage() {
       fetchedAt.textContent = '';
     }
 
-    // 按勾选状态记住/清除密钥（仅本机 localStorage）
-    if (rememberKey.checked) localStorage.setItem('ocusage_key', key);
-    else localStorage.removeItem('ocusage_key');
+    // 按勾选状态记住密钥（仅本机 localStorage，支持多 key 轮换）
+    if (rememberKey.checked) { addKey(key); localStorage.setItem('ocusage_last', key); }
+    else localStorage.removeItem('ocusage_last');
+
+    const item = loadKeys().find(k => k.key === key);
+    keyLabel.textContent = item ? item.label : '';
+    keyLabel.style.display = item ? '' : 'none';
 
     usageArea.style.display = 'block';
   } catch (e) {
@@ -441,22 +447,77 @@ async function checkUsage() {
 checkBtn.addEventListener('click', checkUsage);
 keyInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkUsage(); });
 
-// 懒人模式：#sk-… 链接直达（hash 不会发送到服务器，加载后从地址栏清除），
-// 或恢复记住的密钥并自动查询
+// 多 key 管理：全部存本机 localStorage，支持备注（双击标签）、轮换（点击）、删除（×）
 const rememberKey = document.getElementById('rememberKey');
+const keyChips = document.getElementById('keyChips');
+const keyLabel = document.getElementById('keyLabel');
+
+function loadKeys() {
+  try { return JSON.parse(localStorage.getItem('ocusage_keys') || '[]'); }
+  catch (e) { return []; }
+}
+function saveKeys(list) { localStorage.setItem('ocusage_keys', JSON.stringify(list)); }
+function addKey(key, label) {
+  const list = loadKeys();
+  if (!list.some(k => k.key === key)) {
+    list.push({ key, label: label || ('Key ' + (list.length + 1)), addedAt: Date.now() });
+    saveKeys(list);
+  }
+  renderKeyChips();
+}
+function renderKeyChips() {
+  const list = loadKeys();
+  if (!list.length) { keyChips.style.display = 'none'; keyChips.innerHTML = ''; return; }
+  keyChips.style.display = 'flex';
+  keyChips.innerHTML = '';
+  for (const item of list) {
+    const chip = document.createElement('span');
+    chip.textContent = item.label;
+    chip.title = '点击切换查询 · 双击修改备注';
+    const active = item.key === keyInput.value;
+    chip.style.cssText = 'padding:3px 10px;border-radius:12px;font-size:12px;cursor:pointer;user-select:none;' +
+      (active ? 'background:#1f6feb33;border:1px solid #58a6ff;color:#58a6ff'
+              : 'background:#21262d;border:1px solid #30363d;color:#8b949e');
+    chip.onclick = () => { keyInput.value = item.key; checkUsage(); };
+    chip.ondblclick = () => {
+      const name = prompt('修改备注', item.label);
+      if (name && name.trim()) {
+        const l = loadKeys(); const it = l.find(k => k.key === item.key);
+        if (it) { it.label = name.trim(); saveKeys(l); renderKeyChips(); }
+      }
+    };
+    const x = document.createElement('b');
+    x.textContent = '×';
+    x.title = '删除';
+    x.style.cssText = 'margin-left:6px;color:#8b949e;font-weight:400';
+    x.onclick = (e) => { e.stopPropagation(); saveKeys(loadKeys().filter(k => k.key !== item.key)); renderKeyChips(); };
+    chip.appendChild(x);
+    keyChips.appendChild(chip);
+  }
+  const clear = document.createElement('span');
+  clear.textContent = '清空';
+  clear.title = '清空所有已存密钥';
+  clear.style.cssText = 'padding:3px 6px;font-size:12px;cursor:pointer;color:#484f58;user-select:none';
+  clear.onclick = () => { saveKeys([]); localStorage.removeItem('ocusage_last'); renderKeyChips(); };
+  keyChips.appendChild(clear);
+}
+
+// 懒人模式：#sk-… 链接直达（hash 不会发送到服务器，加载后从地址栏清除），
+// 或恢复上次使用的密钥并自动查询；旧版单 key 存储自动迁移
 (function initKey() {
+  const legacy = localStorage.getItem('ocusage_key');
+  if (legacy) { addKey(legacy.trim()); localStorage.removeItem('ocusage_key'); }
   const hash = decodeURIComponent(location.hash.replace(/^#/, '')).trim();
-  const saved = localStorage.getItem('ocusage_key');
-  if (hash.startsWith('sk-')) {
-    keyInput.value = hash;
+  const list = loadKeys();
+  const last = localStorage.getItem('ocusage_last') || (list.length ? list[list.length - 1].key : '');
+  const target = hash.startsWith('sk-') ? hash : last;
+  if (target) {
+    keyInput.value = target;
     rememberKey.checked = true;
-    history.replaceState(null, '', location.pathname + location.search);
-    checkUsage();
-  } else if (saved) {
-    keyInput.value = saved;
-    rememberKey.checked = true;
+    if (hash.startsWith('sk-')) history.replaceState(null, '', location.pathname + location.search);
     checkUsage();
   }
+  renderKeyChips();
 })();
 
 // Ctrl+V / paste detection: auto-check on paste if it looks like an API key
